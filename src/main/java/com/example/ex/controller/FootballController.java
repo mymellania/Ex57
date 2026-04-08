@@ -27,6 +27,7 @@ public class FootballController {
 
     // master 작성1:43
     // master 작성1:45
+    // master 작성2:22
 
     @Autowired
     private FootballMapper footballMapper;
