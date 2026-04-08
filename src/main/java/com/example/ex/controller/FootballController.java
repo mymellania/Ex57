@@ -22,6 +22,7 @@ import java.util.Map;
 @Controller
 public class FootballController {
 
+    // branch1 1:04 추가
     @Autowired
     private FootballMapper footballMapper;
 
