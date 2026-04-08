@@ -1,0 +1,78 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>    
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>	
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>	
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+	.err{
+	font-size: 9pt;
+	color: red;
+	font-weight: bold;
+	}
+</style>
+</head>
+<body>
+content_view.jsp
+	<form:form commandName="fDto" action="modify" method="post">
+		<input type="hidden" name="num" value="${fDto.num}">
+		<table width="700" height="200" cellpadding="0" cellspacing="0" border="1">
+			<tr>
+				<td>번호</td>
+				<td>${fDto.num}</td>
+			</tr>
+			<tr>
+				<td>아이디</td>
+				<td>${fDto.id}
+				<input type="hidden" name="id" value="${fDto.id}"></td>
+				<!-- 윗줄에서 id를 hidden으로 안넘기면 처음에는 content_view.jsp로 id가 잘 넘어오지만
+				뭔가 누락되서 다시 content_view.jsp로 올때 id가 안넘어온다. --> 
+			</tr>
+			<tr>
+				<td>비번</td>
+				<td><input type="text" name="pw" value="${fDto.pw}">
+				<form:errors cssClass="err" path="pw" /></td>
+			</tr>
+			<tr>
+				<td>우승예상국가</td>
+				<td>
+					<input type="radio" name="win" value="한국" <c:if test="${fDto.win eq '한국'}"> checked</c:if> >한국</input>
+					<input type="radio" name="win" value="미국" <c:if test="${fDto.win eq '미국'}"> checked</c:if> >러시아</input>
+					<input type="radio" name="win" value="독일" <c:if test="${fDto.win eq '독일'}"> checked</c:if> >독일</input>
+					<input type="radio" name="win" value="스페인" <c:if test="${fDto.win eq '스페인'}"> checked</c:if> >스페인</input>
+					<form:errors cssClass="err" path="win" />
+				</td>
+			</tr>
+			<tr>
+				<td>16강예상국가</td>
+				<td>
+					<%-- <c:set var="theString" value="${fDto.round16 }"/> --%>
+					<!-- 위의 set설정하고 아랫줄로 해도 된다. --> 
+					<%-- ${fn:contains(theString,'한국')} --%> 
+					<input type="checkbox" name="round16"  value="한국" <c:if test="${fn:contains(fDto.round16,'한국')}"> checked</c:if> >한국</input>
+					<input type="checkbox" name="round16"  value="멕시코" <c:if test="${fn:contains(fDto.round16,'멕시코')}"> checked</c:if> >멕시코</input>
+					<input type="checkbox" name="round16"  value="독일" <c:if test="${fn:contains(fDto.round16,'독일')}"> checked</c:if> >독일</input>
+					<input type="checkbox" name="round16"  value="브라질" <c:if test="${fn:contains(fDto.round16,'브라질')}"> checked</c:if> >브라질</input>
+					<input type="checkbox" name="round16"  value="스위스" <c:if test="${fn:contains(fDto.round16,'스위스')}"> checked</c:if> >스위스</input>
+					<input type="checkbox" name="round16"  value="잉글랜드" <c:if test="${fn:contains(fDto.round16,'잉글랜드')}"> checked</c:if> >잉글랜드</input>
+					<%-- <c:if test="${fn:contains(${fDto.round16 },'한국')}"> 에러--%>
+					<%-- <c:if test="${fn:contains(fDto.round16,'한국')}"> 잘됨-이줄로 하면 위에 theString변수 만들필요 없겠다. --%>
+					<form:errors cssClass="err" path="round16" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+				<input type="submit" value="수정">
+					&nbsp;&nbsp; 
+					<a href="list">목록보기</a> &nbsp;&nbsp; 
+					<a	href="delete?num=${fDto.num}">삭제</a> &nbsp;&nbsp;
+				</td>
+			</tr>
+		</table>
+	</form:form>
+</body>
+</html>

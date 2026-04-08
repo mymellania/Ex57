@@ -1,0 +1,85 @@
+<!-- resources/templates/write2.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>입력 폼</title>
+	<style>
+		.err {
+            font-size: 9pt;
+            color: red;
+            font-weight: bold;
+        }
+	</style>
+	<script src="/resources/js/jquery.js"></script>
+
+	<script>
+		// 라디오 버튼 선택 해제
+        $(document).ready(function () { // 안됨
+            alert(1);
+            $('input[type=radio][name=win]').click(function () {
+                if ($(this).prop('checked') && $(this).data('waschecked')) {
+                    $(this).prop('checked', false);
+                    $(this).data('waschecked', false);
+                } else {
+                    $('input[type=radio][name=win]').data('waschecked', false);
+                    $(this).data('waschecked', true);
+                }
+            });
+        });
+	</script>
+</head>
+<body>
+
+<h3>write_form.html</h3>
+round16 : (<span th:text="*{round16}"></span>)
+<form th:action="@{/writePro}" method="post" th:object="${fDto}">
+	<table width="700" height="200" cellpadding="0" cellspacing="0" border="1">
+		<tr>
+			<th>아이디</th>
+			<td>
+				<input type="text" th:field="*{id}" />
+				<div th:if="${#fields.hasErrors('id')}" th:errors="*{id}" class="err"></div>
+			</td>
+		</tr>
+		<tr>
+			<th>비번</th>
+			<td>
+				<input type="text" th:field="*{pw}" size="50" />
+				<div th:if="${#fields.hasErrors('pw')}" th:errors="*{pw}" class="err"></div>
+			</td>
+		</tr>
+		<tr>
+			<th>우승예상국가</th>
+			<td>
+				<input type="radio" th:field="*{win}" value="한국" />한국
+				<input type="radio" th:field="*{win}" value="미국" />미국
+				<input type="radio" th:field="*{win}" value="독일" />독일
+				<input type="radio" th:field="*{win}" value="스페인" />스페인
+				<div th:if="${#fields.hasErrors('win')}" th:errors="*{win}" class="err"></div>
+			</td>
+		</tr>
+		<tr>
+			<th>16강예상국가 (<span th:text="*{round16}"></span>)</th>
+			<td>
+				<input type="checkbox" th:field="*{round16}" value="한국" />한국
+				<input type="checkbox" th:field="*{round16}" value="멕시코" />멕시코
+				<input type="checkbox" th:field="*{round16}" value="독일" />독일
+				<input type="checkbox" th:field="*{round16}" value="브라질" />브라질
+				<input type="checkbox" th:field="*{round16}" value="스위스" />스위스
+				<input type="checkbox" th:field="*{round16}" value="잉글랜드" />잉글랜드
+				<div th:if="${#fields.hasErrors('round16')}" th:errors="*{round16}" class="err"></div>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">
+				<input type="submit" value="입력" />
+				&nbsp;&nbsp;
+				<a th:href="@{/list}">목록보기</a>
+			</th>
+		</tr>
+	</table>
+</form>
+
+</body>
+</html>

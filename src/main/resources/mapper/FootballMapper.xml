@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--위의 http://mybatis.org/dtd/mybatis-3-mapper.dtd는 pom.xml의 mybatis-spring-boot-starter를 설정하니까 에러가 안난다.-->
+<!--아래 mapper resultMap select ~~ 태그등은 pom.xml의 oracle repositories 설정하니까 에러가 안난다.-->
+
+<mapper namespace="com.example.ex.mapper.FootballMapper">
+
+    <resultMap id="footballResultMap" type="com.example.ex.dto.FootBallDto">
+        <id property="num" column="num"/>
+        <!--위 id태그는 해당 필드가 "PK(Primary Key, 기본 키)" 역할을 한다고 MyBatis에게 알려주는 것
+        id를 result로해도 되지만,
+        복잡한 쿼리나 조인 시 문제가 생길 수 있음-->
+        <result property="id" column="id"/>
+        <result property="pw" column="pw"/>
+        <result property="win" column="win"/>
+        <result property="round16AsString" column="round16"/>
+    </resultMap>
+    <!--위의 resultMap 코드는 select한 결과를 DTO의 특정 속성에 매핑할 때 사용한다.
+    <resultMap>은 SELECT할 때만 사용됩니다.
+    <result property="round16AsString" column="round16"/>에서
+    setRound16AsString()가 호출된다.
+    round16칼럼값을 setRound16AsString()에 넣으라는 뜻이다.
+    setRound16AsString()가 있어야 한다.
+    DB → DTO 방향에서만 쓰입니다.
+    round16칼럼값이 round16AsString변수에 담긴다.
+    select에서 가져온 round16칼럼값은 문자열인데
+    이것을 List<String> 형태로 써야 checkbox나 로직에 사용 가능하다.
+    그래서 setRound16AsString를 통해 문자열을 List형태로 만들어서
+    List<String> round16에 넣어주고 있다.
+
+    insert는 Java → DB 방향이므로 resultMap 필요없음
+
+    위 result~에서 round16AsString만 놔두고 나머지는 생략해도 잘됨,round16AsString는 꼭 있어야 함
+
+    -->
+
+   <!-- resultType을 사용하면 MyBatis는 setRound16AsString(String)을 호출하지 않습니다.
+    → 결국 round16 필드는 초기화되지 않음 → list.html에 아무것도 출력되지 않음
+    그래서 위의 footballResultMap을 사용함 -->
+    <!--<select id="selectAll" resultType="com.example.ex.dto.FootBallDto"> 이줄을 아래처럼 변경해야한다. -->
+   <!-- <select id="selectAll" resultMap="footballResultMap">
+        &lt;!&ndash;SELECT * FROM football order by num asc&ndash;&gt;
+        SELECT num, id, pw, win, round16  FROM football ORDER BY num ASC
+    </select>-->
+
+    <select id="selectAll" parameterType="map" resultMap="footballResultMap">
+        SELECT *
+        FROM football
+        <where>
+            <choose>
+                <when test="whatColumn == 'all' and keyword != null and keyword != ''">
+                    <!--keyword != null and keyword != '' 둘 중 하나만 넣어도 잘되는데.. 챗GPT가 왜 2개를 넣었지?  아래 설명 읽기-->
+			<!--keyword != ''에 ' ' 이렇게 공백 들어가면 검색이 안되고 에러난다.-->
+
+                    win LIKE '%' || #{keyword} || '%'
+                    OR round16 LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="whatColumn != null and whatColumn != 'all' and keyword != null and keyword != ''">
+                    ${whatColumn} LIKE '%' || #{keyword} || '%'
+                </when>
+                <!-- otherwise는 조건이 없을 경우 WHERE 절을 없애거나 유지
+
+                위의 두번째 when~을 안쓰면 중국 검색했을 때 첫 페이지에는 중국이 잘 나오는데,
+                2페이지 클릭하면 중국이 아닌것도 들어가있다.
+                이유 :
+                getCount()는 제대로 두번째 when도 썼으니까 해당 검색어가 포함된 레코드 갯수에 맞게 페이지 설정이 되지만,
+                이 위의 sql에서는  두번째 when~을 안쓰면 whatColumn이 area가 아니니까 조건에 맞는게 없어서 전체 레코드 다 나온다.
+                우연히 1페이지에 중국  데이터가 있어서 보였던 것 뿐이다.
+                -->
+            </choose>
+        </where>
+        ORDER BY num ASC
+        OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="getCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM football
+        <where>
+            <choose>
+                <when test="whatColumn == 'all' and keyword != null and keyword != ''">
+                    win LIKE '%' || #{keyword} || '%'
+                    OR round16 LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="whatColumn != null and whatColumn != 'all' and keyword != null and keyword != ''">
+                    ${whatColumn} LIKE '%' || #{keyword} || '%'
+                </when>
+            </choose>
+        </where>
+    </select>
+    <!--
+    resultType="FootBallDto"로 하면
+    round16 칼럼값이 문자열인데 이것을  setRound16(List<String> round16)로 넘길수가 없다.
+    String을 List<String> round16 타입 변수에 넣을수가 없다. 그래서 null이 들어간다.
+
+    round16 컬럼의 값을 → setRound16AsString(String) 메서드에 전달
+    → 내부에서 List<String> round16 필드가 설정됨
+    → getRound16()이나 getRound16AsString() 호출 시 정상 값 반환됨
+    -->
+    <!--아래도 되나 해보자-김희주-->
+    <!--<select id="selectAll" resultType="com.example.Ex02.dto.FootballDto">
+        select num, id, pw, win, round16 as round16AsString from football order by num
+    </select>-->
+   <!-- <insert id="insertFootball" parameterType="com.example.ex.dto.FootBallDto">
+        INSERT INTO football (num, id, pw, win,round16)
+        VALUES (fb_seq.nextval, #{id}, #{pw}, #{win}, #{round16})
+    </insert>-->
+    <!--insert는 Java → DB 방향이므로 resultMap 필요없음 -->
+    <insert id="insertFootball" parameterType="com.example.ex.dto.FootBallDto">
+        INSERT INTO football (num, id, pw, win,round16)
+        VALUES (fb_seq.nextval, #{id}, #{pw}, #{win}, #{round16AsString})
+    </insert>
+    <!--
+    #{round16AsString}을 #{round16}으로 하면 에러남
+    #{round16}는 checkbox로 선택된 복수 값(List 또는 배열)인데,
+    MyBatis는 문자열만 자동 매핑해주기 때문에
+    List<String>을 그냥 #{round16}으로 쓰면 문법 오류 또는 바인딩 실패가 발생합니다.
+    그래서..
+    리스트 값을 ,로 연결해서 저장하고 싶다면, DTO에서 리스트를 문자열로 변환해주는 작업이 필요합니다.
+
+    #{round16AsString}에서 getRound16AsString() 메서드를 자동으로 호출한다.
+
+    round16AsString은 DTO의 getter 메서드 이름에 자동으로 매핑됩니다.
+    위 insert에 round16AsString을 썼는데 저 아래 updae에서 그냥 round16으로만 하면
+    전체 실행이 안되니까
+    아래 update도 round16AsString으로 바꾸자~ 와~ 해결됨~~~ -->
+
+    <!--<select id="findByNum" resultType="com.example.ex.dto.FootBallDto">-->
+    <select id="findByNum" resultMap="footballResultMap">
+        SELECT num, id, pw, win, round16 FROM football where num=#{num}
+    </select>
+<!--
+    1. DB에서 round16 컬럼 값을 "한국,미국"으로 읽음
+    2. MyBatis가 round16AsString 프로퍼티에 값을 주입함 => 저 위의 <result property="round16AsString" column="round16"/> 이 설정때문에..
+    3. setRound16AsString("한국,미국") 메서드가 자동으로 호출됨
+    4. 이 메서드 내부에서 round16 = Arrays.asList("한국", "미국") 실행됨
+    5. 즉, round16 리스트가 자동 초기화됨 → 뷰에서 checkbox 자동 체크 가능
+
+    DB에서 round16이라는 컬럼의 값을 읽어서, DTO의 setRound16AsString(String) 메서드를 호출해라
+    getRound16AsString()는 다음과 같은 상황에서 호출됩니다:
+    데이터 저장할 때
+    예: insert, update 시 MyBatis가 #{round16AsString}을 읽어야 할 때
+
+    <span th:text="*{round16AsString}">
+    Thymeleaf에서 출력하려고 할 때
+
+    즉, 이 메서드는 출력용 / 저장용으로 사용되는 getter입니다.
+    → DB에서 읽어올 때는 전혀 호출되지 않습니다.
+-->
+
+    <!--   num,pw,win,round16 만 넘어온다.-->
+    <update id="updateFootball" parameterType="com.example.ex.dto.FootBallDto">
+        update football set pw = #{pw}, win = #{win}, round16 = #{round16AsString}
+        where num=#{num}
+    </update>
+
+    <!--아래 parameterType은 int 또는 생략하면 안되나?-->
+    <delete id="deleteFootball" parameterType="com.example.ex.dto.FootBallDto">
+        delete from football
+        where num=#{num}
+    </delete>
+</mapper>
+<!--        mybatis.type-aliases-package=com.example.demo4.dto-->
+

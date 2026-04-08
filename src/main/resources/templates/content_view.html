@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Content View</title>
+	<style>
+		.err {
+            font-size: 9pt;
+            color: red;
+            font-weight: bold;
+        }
+	</style>
+</head>
+<body>
+<p>content_view.html</p>
+[[${whatColumn}]]/[[${keyword}]]/[[${page}]] <br>
+
+<form th:action="@{/modify}" method="post" th:object="${fDto}">
+	round16 : (<span th:text="*{round16}"></span>)
+	<!-- 번호 -->
+	<input type="hidden" th:field="*{num}" />
+	<input type="hidden" name="whatColumn" th:value="${whatColumn}" />
+	<input type="hidden" name="keyword" th:value="${keyword}" />
+	<input type="hidden" name="page" th:value="${page}" />
+
+	<table width="700" height="200" cellpadding="0" cellspacing="0" border="1">
+		<tr>
+			<td>번호</td>
+			<td th:text="*{num}"></td>
+		</tr>
+
+		<!-- 아이디 -->
+		<tr>
+			<td>아이디</td>
+			<td>
+				<span th:text="*{id}"></span>
+				<input type="hidden" th:field="*{id}" />
+				<!--넘기지 않으면 첫 수정폼에는 뜨지만 누락되서 다시 수정폼으로 갈때에는 id를 가져가지 않으니까
+				FootBallDto fdto에 들어가는 id가 없어서 다시 content_view.html로 왔을 때
+				아이디 자리는 비어있게 된다. 위처럼 hidden으로라도 꼭 넘겨야 한다.
+				-->
+			</td>
+		</tr>
+
+		<!-- 비밀번호 -->
+		<tr>
+			<td>비번</td>
+			<td>
+				<!--type=password면 value에 비번이 나오지 않는다.
+				type=text로 하면 잘 나온다.-->
+				<input type="password" th:field="*{pw}" />
+				<div class="err" th:if="${#fields.hasErrors('pw')}" th:errors="*{pw}"></div>
+			</td>
+		</tr>
+
+		<!-- 우승 예상국가 (Radio) -->
+		<tr>
+			<td>우승예상국가</td>
+			<!--<td>
+				<label><input type="radio" name="win" value="한국" th:checked="${fDto.win == '한국'}">한국</label>
+				<label><input type="radio" name="win" value="미국" th:checked="${fDto.win == '미국'}">미국</label>
+				<label><input type="radio" name="win" value="독일" th:checked="${fDto.win == '독일'}">독일</label>
+				<label><input type="radio" name="win" value="스페인" th:checked="${fDto.win == '스페인'}">스페인</label>
+				<div class="err" th:if="${#fields.hasErrors('win')}" th:errors="*{win}"></div>
+			</td>-->
+			<td>
+				<span th:each="nation : ${nationList}">
+					<label>
+						<input type="radio" name="win" th:value="${nation}"
+							   th:checked="${fDto.win == nation}"/> [[${nation}]]
+							<!--왜 fDto.win를 그냥 win을 하면 안되지? 다른 곳에서는 fDto.없이 그냥 쓰고 있는데..
+							th:checked="${fDto.win == nation}"
+							th:checked는 *{} 표현을 직접 사용할 수 없기 때문에 ${fDto.win == nation}으로 해야한다.
+							(th:checked="*{win == nation}" 이거 안됨)
+							-->
+					</label>
+				</span>
+
+				<div class="err" th:if="${#fields.hasErrors('win')}" th:errors="*{win}"></div>
+			</td>
+		</tr>
+
+		<!-- 16강 예상국가 (Checkboxes) -->
+		<tr>
+			<td>16강예상국가</td>
+			<!--<td>
+				<label><input type="checkbox" name="round16" value="한국" th:checked="${fDto.round16 != null and fDto.round16.contains('한국')}">한국</label>
+				<label><input type="checkbox" name="round16" value="멕시코" th:checked="${fDto.round16 != null and fDto.round16.contains('멕시코')}">멕시코</label>
+				<label><input type="checkbox" name="round16" value="독일" th:checked="${fDto.round16 != null and fDto.round16.contains('독일')}">독일</label>
+				<label><input type="checkbox" name="round16" value="브라질" th:checked="${fDto.round16 != null and fDto.round16.contains('브라질')}">브라질</label>
+				<label><input type="checkbox" name="round16" value="스위스" th:checked="${fDto.round16 != null and fDto.round16.contains('스위스')}">스위스</label>
+				<label><input type="checkbox" name="round16" value="잉글랜드" th:checked="${fDto.round16 != null and fDto.round16.contains('잉글랜드')}">잉글랜드</label>
+				<div class="err" th:if="${#fields.hasErrors('round16')}" th:errors="*{round16}"></div>
+			</td>-->
+
+			<td>
+				<span th:each="nation : ${round16List}">
+					<label>
+						<input type="checkbox" name="round16"
+							   th:value="${nation}"
+							   th:checked="${fDto.round16 != null and fDto.round16.contains(nation)}" />
+						<!--
+						윗줄에서 fDto.round16 != null and 생략하면 안됨, 생략하면 체크 누락됐을 때 에러가 뜬다.
+						생략해도 잘되는데..
+						체크 누락되면 fDto.round16에 들어간 값이 없는데 각 nation이 포함되었는지 확인해야하니까 에러가 뜬다.
+						System.out.println("abcdefg".contains("bc")); 이건 가능하지만
+						System.out.println(null.contains("bc")); 이건 에러가 뜬다.
+						먼저 fDto.round16 != null을 평가하고,
+						만약 false이면 뒤에 있는 fDto.round16.contains(nation)은 절대 실행하지 않습니다.
+						따라서 fDto.round16이 null일 경우, contains() 호출로 인한 NullPointerException이 발생하지 않습니다.
+						fDto.round16AsString으로 해도 된다.
+						-->
+						[[${nation}]]
+					</label>
+				</span>
+
+				<div class="err" th:if="${#fields.hasErrors('round16')}" th:errors="*{round16}"></div>
+			</td>
+		</tr>
+
+		<!-- 버튼 -->
+		<tr>
+			<td colspan="2">
+				<input type="submit" value="수정" />
+				&nbsp;&nbsp;
+				<a th:href="@{/list}">목록보기</a>
+				&nbsp;&nbsp;
+				<a th:href="@{/delete(num=${fDto.num}, page=${page}, whatColumn=${param.whatColumn}, keyword=${param.keyword})}">삭제</a>
+			</td>
+		</tr>
+	</table>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+</head>
+<style>
+	tr:first-child{
+		background-color : yellow;
+	}
+	tr:last-child{
+		background-color : pink;
+	}
+	.center {
+        width : 600px;
+        margin : 20px auto;
+    }
+ 	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 0 auto;
+	}
+</style>
+<body>
+list.html<br>
+<!--레코드갯수 : ${fn:length(list)}<br>
+<table width="500" cellpadding="0" cellspacing="0" border="1">-->
+<!-- 		num number,
+id varchar2(20),
+name varchar2(20),
+birth date default sysdate,
+ --><!--
+		<tr>
+			<td>번호</td>
+			<td>아이디</td>
+			<td>비번</td>
+			<td>우승 예상국가</td>
+			<td>16강 예상국가</td>
+		</tr>
+		<c:forEach items="${list}" var="dto"> &lt;!&ndash; requestScope.list 도 가능 &ndash;&gt;
+		<tr>
+			<td>${dto.num}</td>
+			<td><a href="content_view?num=${dto.num}">${dto.id}</a></td>
+			<td>${dto.pw}</td>
+			<td>${dto.win}</td>
+			<td>${dto.round16}</td>
+		</tr>
+		</c:forEach>
+		<tr>
+			<td colspan="5"> 
+			<a href="javascript:history.go(-1)">돌아가기</a>
+			 <a href="write_view">삽입</a>
+			 <a href="write_view2">삽입2</a>
+			&lt;!&ndash;  위의 write_view대신 write_view.jsp라고 쓰면
+			 http://localhost:9090/ex/write_view.jsp &ndash;&gt;
+			</td>
+		</tr>
+	</table>-->
+
+<!-- Thymeleaf 템플릿 예시 -->
+<p>레코드갯수 : <span th:text="${list.size()}"></span>/<span th:text="${totalCount}"></span></p>
+<div class="center">
+<h2 align="center">월드컵 리스트 화면(<span th:text="${page}"></span>)</h2>
+<center>
+	<form th:action="@{list}" method="get">
+		<select name="whatColumn">
+			<option value="all">전체 검색
+			<option value="win">우승 예상국가
+			<option value="round16">16강 예상국가
+		</select>
+		<input type="text" name="keyword" value="한국">
+		<input type="submit" value="검색">
+	</form>
+</center>
+<table width="500" cellpadding="0" cellspacing="0" border="1">
+	<tr>
+		<th>번호</th>
+		<th>아이디</th>
+		<th>비번</th>
+		<th>우승 예상국가</th>
+		<th>16강 예상국가</th>
+	</tr>
+
+	<!-- 리스트 반복 출력 -->
+	<tr th:each="dto : ${list}">
+		<td th:text="${dto.num}"></td>
+		<td>
+			<a th:href="@{/content_view(num=${dto.num}, page=${page}, whatColumn=${param.whatColumn}, keyword=${param.keyword})}" th:text="${dto.id}"></a>
+		</td>
+		<td th:text="${dto.pw}"></td>
+		<td th:text="${dto.win}"></td>
+		<!--<td th:text="${dto.round16}"></td>-->
+		<td th:text="${dto.round16AsString}"></td>
+	</tr>
+
+	<tr>
+		<th colspan="5">
+			<a href="javascript:history.go(-1)">돌아가기</a> &nbsp;&nbsp;&nbsp;
+			<a th:href="@{/write_form}">삽입(write_form)</a>
+
+		</th>
+	</tr>
+</table>
+</div>
+<div style="text-align:center; margin-top:20px;">
+	<!-- 이전 버튼 -->
+	<span th:if="${page > 1}">
+        <a th:href="@{/list(page=${page-1}, whatColumn=${param.whatColumn}, keyword=${param.keyword})}">이전</a>
+    </span>
+
+	<!-- 페이지 번호 -->
+	<span th:each="i : ${#numbers.sequence(1, totalPage)}">
+        <a th:if="${i != page}"
+		   th:href="@{/list(page=${i}, whatColumn=${param.whatColumn}, keyword=${param.keyword})}"
+		   th:text="${i}">1</a>
+        <span th:if="${i == page}" th:text="${i}" style="font-weight:bold; color:red;"></span>
+    </span>
+
+	<!-- 다음 버튼 -->
+	<span th:if="${page < totalPage}">
+        <a th:href="@{/list(page=${page+1}, whatColumn=${param.whatColumn}, keyword=${param.keyword})}">다음</a>
+    </span>
+</div>
+</body>
+</html>
+
+
