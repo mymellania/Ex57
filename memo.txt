@@ -1,0 +1,53 @@
+drop table football;
+create table football(
+num number primary key,
+id varchar2(10),
+pw varchar2(20),
+win varchar2(10),
+round16 varchar2(60)
+);
+
+drop sequence fb_seq;
+create sequence fb_seq
+minvalue 1
+start with 1
+nocache;
+
+commit;
+
+col id for a6
+col pw for a6
+col win for a10
+col round16 for a30
+select * from football;
+
+pom.xml의 oracle dependency설정에서 에러가 날때..
+Error reading file C:\Users\user\.m2\repository\com\oracle\ojdbc8\12.2.0\ojdbc8-12.2.0.jar
+C:\Users\user\.m2\repository\com\oracle\ojdbc8\12.2.0\ojdbc8-12.2.0.jar (지정된 파일을 찾을 수 없습니다)
+
+
+https://suyou.tistory.com/68 을 보면서 하다가
+https://copycoding.tistory.com/176 이 사이트를 따라 하다가
+apache-maven-3.6.3-bin.zip 아래의 화일을 다운 받는다.
+
+위 사이트를 따라 하면 pom.xml의 위쪽에 있는
+repositories~ 설정은 안해도 된다.
+
+--------------------------------------------------------------------------------------------
+2022.08.22
+interface를 상속받아서 하니까
+입력받은 항목을command 객체를 만들면서 그 command 객체를 다시 write_view로 보내서 유효성 검사하기가 애매하다.
+해봤는데 안된다. 방법이 있을것 같긴한데 모르겠다.
+여기서는 valid 안하는게 나을것 같다.
+=>아니다. 잘 완성했다. 수업하자. ㅎㅎㅎ
+
+spring 5 에서는 command객체가 없어진다고 한다. 헐~
+--------------------------------------------------------------------------------------------
+2025.02.27
+파일명 뒤에 2가 붙은것은 입력한 값을 bean으로 묶어서 request 속성으로 처리한 것이고
+2가 붙지 않은것은 model로 처리한 것이다. request가 더 낫지 않나??
+
+
+
+
+
