@@ -1,0 +1,149 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+	.err{
+	font-size: 9pt;
+	color: red;
+	font-weight: bold;
+	}
+</style>
+<!-- <script type="text/javascript" src="/resources/js/jquery.js"></script> -->
+<script src="<c:url value="/resources/js/jquery.js"/>"></script>
+
+<script type="text/javascript">
+//https://landzz.com/129 라디오 해제
+
+$(document).ready(function(){
+//$(function(){
+	//alert(1);
+
+	$('input[name=win]').each(function(){
+		//alert($(this).val());
+		/*
+		var chk = $(this).is(":checked");
+    	var name = $(this).attr('name');   // <- 여기 radio name값 넣으면 끝
+    	alert(chk +"/" + name);
+    	if(chk == true) $("input[name='"+name+"']").data("previous",$(this).val());
+		*/
+	});
+	/*
+	$('input[type="radio"]').click(function(){
+	    // 현재 클릭된 라디오 버튼이 이미 선택된 상태라면 선택 해제
+	    if ($(this).is(':checked')) {
+	      $(this).prop('checked', false);
+	    }
+	  });
+	 */
+});
+
+	function init(){ // 왜 안뜨지? body에 onload="init()" 하면 된다.
+		//alert('init');
+
+
+	}
+
+	//$(document).ready(function(){
+	//$(function(){
+		//alert(1);
+
+	//});
+	/* $(document).on('click','input[name="win"]',function(){
+		alert($(this).val());
+	}); */
+
+	function deselect(obj){  // radio check 해제 상태로 만들려고 하는데 안됨
+		//location.reload();
+		//alert(obj.value);
+		//$(obj).prop('checked',false);
+		//alert(obj.checked); // 왜 계속 true지?
+
+		//alert(obj.is(":checked"));
+
+		/* var check = obj.checked;
+		if(check){
+			this.checked = false;
+		}else{
+			this.checked = true;
+		} */
+
+		/* if($(obj).is(":checked")){
+			$(this).prop("checked",false);
+		}else{
+			$(this).prop("checked",true);
+		} */
+
+		//$('input[name=win]').each(function(){
+			//alert($(this).val());
+
+			/* var chk = $(this).is(":checked");
+	    	var name = $(this).attr('type');   //<- 여기 radio name값 넣으면 끝
+	    	alert(chk +"/" + name);
+	    	if(chk == true) $("input[name='"+name+"']").data("previous",$(this).val()); */
+
+	    	/*
+	    	var flag = false;
+			if($(this).checked){
+				$(this).attr('checked',false);
+			}else{
+				$(this).attr('checked',true);
+			}
+			*/
+
+	} // deselect
+</script>
+</head>
+<body ><!-- onLoad="init()" -->
+<%-- ${fDto.id }/${fDto.pw }/${fDto.win }/${fDto.round16 }<br> --%>
+	write_view2.jsp<br><br>
+	<form:form  action="write2" method="post" commandName="fDto" >
+	<%-- ${fDto.id }/${fDto.pw }/${fDto.win }/${fDto.round16 }<br> --%>
+		<table width="700" height="200" cellpadding="0" cellspacing="0" border="1" >
+			<tr>
+				<td>아이디</td>
+				<td><input type="text" name="id" value="${ fDto.id }">
+				 <form:errors cssClass="err" path="id"/></td>
+			</tr>
+			<tr>
+				<td>비번</td>
+				<td><input type="text" name="pw" size="50" value="${fDto.pw }">
+				<form:errors cssClass="err" path="pw" /></td>
+			</tr>
+			<tr>
+				<td>우승예상국가</td>
+				<td> <!-- onClick="deselect(this)" 라디오 선택 해제는 어떻게 해야되지? -->
+					<input type="radio" name="win" value="한국" <c:if test="${fDto.win eq '한국' }">checked</c:if> onClick="deselect(this)">한국
+					<input type="radio" name="win" value="미국" <c:if test="${fDto.win eq '미국' }">checked</c:if>>미국
+					<input type="radio" name="win" value="독일" <c:if test="${fDto.win eq '독일' }">checked</c:if>>독일
+					<input type="radio" name="win" value="스페인" <c:if test="${fDto.win eq '스페인' }">checked</c:if>>스페인
+					<form:errors cssClass="err" path="win" /><br />
+				</td>
+			</tr>
+			<tr>
+				<td>16강예상국가(${fDto.round16 })</td>
+				<td>
+					<input type="checkbox" name="round16" value="한국" <c:if test="${fn:contains(fDto.round16,'한국')}">checked</c:if>/>한국
+					<input type="checkbox" name="round16" value="멕시코" <c:if test="${fn:contains(fDto.round16,'멕시코')}">checked</c:if>>멕시코
+					<input type="checkbox" name="round16" value="독일" <c:if test="${fn:contains(fDto.round16,'독일')}">checked</c:if>>독일
+					<input type="checkbox" name="round16" value="브라질" <c:if test="${fn:contains(fDto.round16,'브라질')}">checked</c:if>>브라질
+					<input type="checkbox" name="round16" value="스위스" <c:if test="${fn:contains(fDto.round16,'스위스')}">checked</c:if>>스위스
+					<input type="checkbox" name="round16" value="잉글랜드" <c:if test="${fn:contains(fDto.round16,'잉글랜드')}">checked</c:if>>잉글랜드
+					<form:errors cssClass="err" path="round16" /><br />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="입력">
+					&nbsp;&nbsp; <a href="list">목록보기</a></td>
+			</tr>
+		</table>
+	</form:form>
+
+</body>
+</html>
