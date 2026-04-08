@@ -26,6 +26,10 @@ public class FootballController {
     // branch1추가
 
     // branch1 1:04 추가
+    // branch2 1:12 추가
+    // branch2 1:17 추가
+    // branch2 1:17 추가
+
     @Autowired
     private FootballMapper footballMapper;
 
